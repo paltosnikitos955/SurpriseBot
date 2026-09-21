@@ -1,0 +1,1 @@
+import {spawnParticles} from "./particles.js"; export const run=(layer,o)=>spawnParticles(layer,{glyph:"✦",density:o?.density||35});
