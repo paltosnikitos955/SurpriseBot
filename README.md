@@ -1,8 +1,6 @@
-# SurpriseBox — готовый MVP
+# SurpriseBot — готовый MVP
 
 Telegram Bot + Telegram Mini App для создания интерактивных цифровых сюрпризов.
-
-Это уже не Stage 3: в архиве собран цельный MVP, который можно загрузить в Amvera и запустить после задания токена бота и URL приложения.
 
 ## Что внутри
 
@@ -31,172 +29,8 @@ Telegram Bot + Telegram Mini App для создания интерактивн�
 - `prefers-reduced-motion`
 - Amvera persistent storage `/data`
 
-## Важное ограничение
-
-Полностью автоматизировать создание Main Mini App через архив невозможно: URL Main Mini App один раз задаётся владельцем бота в @BotFather. После этого код уже умеет использовать `startapp` deep links.
-
-Официальная документация Telegram подтверждает, что Main Mini App настраивается через @BotFather, а ссылка вида `https://t.me/<botusername>?startapp=<id>` передаёт значение в `start_param`. Fullscreen API и safe-area также поддерживаются Telegram Mini Apps.
-
-## 1. Создай бота
-
-В Telegram открой @BotFather:
-
-1. `/newbot`
-2. создай бота
-3. получи `BOT_TOKEN`
-
-## 2. Разверни проект в Amvera
-
-Создай приложение типа Python/Pip и загрузите содержимое этого архива в корень репозитория.
-
-В проекте уже есть `amvera.yaml`.
-
-Он использует:
-
-```yaml
-meta:
-  environment: python
-  toolchain:
-    name: pip
-    version: "3.11"
-
-build:
-  requirementsPath: requirements.txt
-
-run:
-  command: python run.py
-  persistenceMount: /data
-  containerPort: 80
-```
-
-Приложение слушает `0.0.0.0:80`.
-
-Данные сюрпризов и загруженные фотографии сохраняются в `/data`, чтобы не теряться при пересборке.
-
-## 3. Переменные окружения Amvera
-
-В настройках приложения добавь:
-
-```env
-BOT_TOKEN=123456:YOUR_REAL_TOKEN
-WEBAPP_URL=https://YOUR-AMVERA-URL
-DATA_DIR=/data
-UPLOADS_DIR=/data/uploads
-MAX_UPLOAD_MB=8
-```
-
-`BOT_USERNAME` необязателен. Если его нет, backend сам получает username через Telegram Bot API при отправке.
-
-`WEBAPP_URL` должен быть именно HTTPS URL работающего приложения Amvera.
-
-## 4. Настрой Main Mini App
-
-В @BotFather:
-
-1. `/mybots`
-2. выбери своего бота
-3. Bot Settings
-4. Configure Mini App
-5. настрой Main Mini App
-6. укажи тот же HTTPS URL, который записан в `WEBAPP_URL`
-
-После этого у бота появится Launch app / Main Mini App.
-
-Telegram использует:
-
-```text
-https://t.me/<bot_username>?startapp=<surprise_id>
-```
-
-для открытия конкретного сюрприза.
-
-## 5. Собери приложение
-
-После загрузки файлов Amvera установит:
-
-```text
-aiogram
-fastapi
-uvicorn
-python-multipart
-httpx
-```
-
-и запустит:
-
-```bash
-python run.py
-```
-
-`run.py` одновременно запускает FastAPI и polling Telegram-бота.
-
-## 6. Что проверить после запуска
-
-Открой URL приложения:
-
-```text
-https://YOUR-AMVERA-URL/
-```
-
-Затем открой бота в Telegram.
-
-Проверь:
-
-- `/start`
-- кнопку `✨ Создать сюрприз`
-- создание сюрприза
-- добавление сцен
-- добавление текста
-- добавление фото
-- добавление эффекта
-- drag & drop
-- Preview
-- Save
-- My Surprises
-- Send
-- получение сообщения ботом
-- открытие кнопки `🎁 Открыть сюрприз`
-- запуск с первой сцены
-- повторный запуск снова с первой сцены
-- изменение `open_count`
-
-## Локальный запуск
-
-```bash
-python -m venv .venv
-```
-
-Linux/macOS:
-
-```bash
-source .venv/bin/activate
-```
-
-Windows PowerShell:
-
-```powershell
-.venv\Scripts\Activate.ps1
-```
-
-Установка:
-
-```bash
-pip install -r requirements.txt
-```
-
-Создай `.env` на основе `.env.example`.
-
-Затем:
-
-```bash
-python run.py
-```
-
-Для Telegram Mini App нужен публичный HTTPS URL. Поэтому локальный браузерный запуск годится для проверки UI, а полноценный Telegram-сценарий удобнее проверять через Amvera или HTTPS tunnel.
-
 ## Структура
 
-```text
 surprisebox/
 ├── run.py
 ├── amvera.yaml
@@ -344,12 +178,6 @@ Final
   ↓
 Replay → Scene 1
 ```
-
-## Примечание по Main Mini App
-
-Кнопка внутри `/start` использует обычный Telegram Web App button, поэтому бот может открыть приложение даже до настройки Main Mini App.
-
-После настройки Main Mini App становятся доступны основной Launch app сценарий и deep links `?startapp=...`.
 
 ## Приоритеты
 
